@@ -1,15 +1,24 @@
 import { runAppleScriptSync } from 'run-applescript'
 import { getPreferenceValues, Clipboard, showHUD, open } from '@raycast/api'
 import Color from 'color'
-import type { Color as ColorObjectType } from 'color'
 
-type BaseColorType = 'hex' | 'rgb' | 'hsl'
+const parseColor = (value: string) => {
+  try {
+    const color = Color(value)
+    return color
+  } catch (e) {
+    // fall-through
+  }
+  return
+}
 
-type ExtraType = 'hexa' | 'rgba' | 'rgbap' | 'hsla' | 'ns' | 'ui'
+const defaultColor = parseColor('#c9c9c9')!
 
-type MoreType = 'hsv' | 'hwb' | 'lab' | 'lch'
+type ColorObjectType = typeof defaultColor
 
-type ColorType = BaseColorType | ExtraType
+type ColorType = 'hex' | 'hexa' | 'rgba' | 'rgbap' | 'hsl' | 'hsla' | 'ns' | 'ui'
+
+type MoreType = 'rgb' | 'hsv' | 'hwb' | 'lab' | 'lch'
 
 type Preferences = {
   colorFormat: ColorType
@@ -56,7 +65,7 @@ const formatColorType = (color: ColorObjectType) => {
   const format = getColorFormat()
   if (format === 'hex') return color.hex()
   if (format === 'hexa') return color.hexa()
-  if (format === 'rgb') return formatRgb(color.rgb())
+  //if (format === 'rgb') return formatRgb(color.rgb())
   if (format === 'rgba') return formatRgba(color.rgb())
   if (format === 'rgbap') return formatRgbap(color.rgb())
   if (format === 'hsl') return formatHsl(color.hsl().object())
@@ -99,19 +108,18 @@ const copyToClipboard = async (value: string) => {
   }
 }
 
-const readClipboard = () =>
+const readClipboard = (): Promise<string> =>
   new Promise(resolve => {
     try {
       const data = runAppleScriptSync(`return (the clipboard as text)`)
-      resolve(data)
-      return
+      if (typeof data === 'string') return resolve(data)
     } catch (e) {
       // fall-through
     }
     resolve('')
   })
 
-export const openPicker = (color: RgbColor) =>
+export const openPicker = (color: RgbColor): Promise<string> =>
   new Promise((resolve, reject) => {
     let result = ''
     try {
@@ -125,25 +133,15 @@ export const openPicker = (color: RgbColor) =>
     resolve(result)
   })
 
-const parseColor = (value: string) => {
-  try {
-    const color = Color(value)
-    return color
-  } catch (e) {
-    // fall-through
-  }
-  return
-}
 
 export const copyColor = async () => {
   const clipboard = await readClipboard()
-  const color = parseColor(clipboard.toLowerCase().trim()) ?? parseColor('#c9c9c9')
-  const value = await openPicker(color.object())
+  const color = parseColor(clipboard.toLowerCase().trim()) || defaultColor
+  const value = await openPicker(color.object() as any)
   if (value) {
     const trimmed = value.trim()
     const newColor = parseColor(trimmed)
     const formatted = newColor ? formatColorType(newColor) : trimmed
-    console.log(formatted)
     copyToClipboard(formatted)
     await showHUD('Color copied to clipboard.')
   }
