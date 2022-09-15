@@ -17,7 +17,6 @@ const defaultColor = parseColor('#c9c9c9')!
 type ColorInstance = typeof defaultColor
 
 type ColorFormat = 'hex' | 'hexa' | 'rgba' | 'rgbap' | 'hsl' | 'hsla' | 'ns' | 'ui'
-type MoreType = 'rgb' | 'hsv' | 'hwb' | 'lab' | 'lch'
 
 type Preferences = {
   colorFormat: ColorFormat
@@ -65,7 +64,6 @@ const formatColorType = (color: ColorInstance) => {
   const format = getColorFormat()
   if (format === 'hex') return color.hex()
   if (format === 'hexa') return color.hexa()
-  //if (format === 'rgb') return formatRgb(color.rgb())
   if (format === 'rgba') return formatRgba(color.rgb())
   if (format === 'rgbap') return formatRgbap(color.rgb())
   if (format === 'hsl') return formatHsl(color.hsl().object() as HslColor)
