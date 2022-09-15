@@ -1,8 +1,13 @@
 import { closeMainWindow } from '@raycast/api'
 import { copyColor } from './utils'
 
+const closeWindow = async () => {
+  await closeMainWindow({ clearRootSearch: true })
+}
+
 const Command = async () => {
-  await Promise.all([copyColor(), closeMainWindow({ clearRootSearch: true })])
+  closeWindow()
+  await copyColor()
   return null
 }
 

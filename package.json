@@ -5,7 +5,6 @@
   "description": "Raycast commands and menu bar icon to toggle color picker",
   "icon": "icon.png",
   "version": "1.0.0",
-  "main": "index.js",
   "author": "jaxson",
   "license": "MIT",
   "categories": [
@@ -13,17 +12,17 @@
   ],
   "commands": [
     {
-      "name": "index",
-      "title": "Color picker menubar",
-      "subtitle": "Opens the native macOS system color picker",
-      "description": "Opens the native macOS system color picker",
+      "name": "menu",
+      "title": "Menubar Color Picker",
+      "subtitle": "Add a menubar button to open the system color picker",
+      "description": "Add a menubar button to open the system color picker",
       "mode": "menu-bar"
     },
     {
       "name": "command",
-      "title": "Open color picker",
-      "subtitle": "Opens the native macOS system color picker",
-      "description": "Opens the native macOS system color picker",
+      "title": "Open Color Picker",
+      "subtitle": "Open the native macOS system color picker ",
+      "description": "Open the native macOS system color picker",
       "mode": "no-view",
       "arguments": []
     }
