@@ -28,7 +28,16 @@
       "required": true,
       "title": "Color Format",
       "default": "hex",
-      "data": [{ "title": "HEX", "value": "hex" }, { "title": "RGB", "value": "rgb" }]
+      "data": [
+        { "title": "Hex", "value": "hex" },
+        { "title": "Hex with Alpha", "value": "hexa" },
+        { "title": "RGBA", "value": "rgba" },
+        { "title": "RGBA (Percentage)", "value": "rgbap" },
+        { "title": "HSL", "value": "hsl" },
+        { "title": "HSL with Alpha", "value": "hsla" },
+        { "title": "NSColor (macOS)", "value": "ns" },
+        { "title": "UIColor (iOS)", "value": "ui" }
+      ]
     }
   ],
   "dependencies": {
