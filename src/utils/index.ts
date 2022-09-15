@@ -7,7 +7,7 @@ const parseColor = (value: string) => {
     const color = Color(value)
     return color
   } catch (e) {
-    // fall-through
+    // Fall-through and return undefined if color can not be parsed
   }
   return
 }
@@ -76,6 +76,7 @@ const formatColorType = (color: ColorInstance) => {
 const formatColor = (color: RgbColor) => [color.r, color.g, color.b].map(c => `_8_to_16(${c})`).join(', ')
 
 // Adapted from https://apple.stackexchange.com/a/321377
+// & https://gist.github.com/tinogomes/2476447
 const makeScript = (color: RgbColor) => `
 tell application "System Events" to set _frontMostApp to (name of processes whose frontmost is true)
 set _frontMostApp to item 1 of _frontMostApp
@@ -103,7 +104,7 @@ const copyToClipboard = async (value: string) => {
     await Clipboard.copy(value)
     return true
   } catch (e) {
-    // fall-through
+    // Fall-through and return false if data was not copied
   }
   return false
 }
@@ -111,10 +112,11 @@ const copyToClipboard = async (value: string) => {
 const readClipboard = (): Promise<string> =>
   new Promise(resolve => {
     try {
+      // Clipboard.readText was never resolving, so using AppleScript instead
       const data = runAppleScriptSync(`return (the clipboard as text)`)
       if (typeof data === 'string') return resolve(data)
     } catch (e) {
-      // fall-through
+      // Fall-through & resolve empty string if no text data
     }
     resolve('')
   })
@@ -140,6 +142,7 @@ export const copyColor = async () => {
   try {
     value = await openPicker(color.rgb().object() as RgbColor)
   } catch (e) {
+    await showHUD('Color could not be copied.')
     return
   }
   if (value) {
