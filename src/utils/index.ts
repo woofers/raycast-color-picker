@@ -17,7 +17,6 @@ const defaultColor = parseColor('#c9c9c9')!
 type ColorObjectType = typeof defaultColor
 
 type ColorType = 'hex' | 'hexa' | 'rgba' | 'rgbap' | 'hsl' | 'hsla' | 'ns' | 'ui'
-
 type MoreType = 'rgb' | 'hsv' | 'hwb' | 'lab' | 'lch'
 
 type Preferences = {
@@ -41,6 +40,7 @@ const getColorFormat = () => {
   return value?.colorFormat ?? 'hex'
 }
 
+const hsl = (value: number) => Math.round(value)
 const rgbap = (value: number) => Math.round((value / 255) * 100)
 const rgbad = (value: number) => rgbap(value) / 100
 
@@ -51,9 +51,9 @@ const formatRgba = (color: ColorObjectType) => `rgba(${color.red()}, ${color.gre
 const formatRgbap = (color: ColorObjectType) =>
   `rgba(${rgbap(color.red())}%, ${rgbap(color.green())}%, ${rgbap(color.blue())}%, 1)`
 
-const formatHsl = (color: HslColor) => `hsl(${color.h}deg, ${color.s}%, ${color.l}%)`
+const formatHsl = (color: HslColor) => `hsl(${hsl(color.h)}deg, ${hsl(color.s)}%, ${hsl(color.l)}%)`
 
-const formatHsla = (color: HslColor) => `hsl(${color.h}deg, ${color.s}%, ${color.l}%, 1)`
+const formatHsla = (color: HslColor) => `hsl(${hsl(color.h)}deg, ${hsl(color.s)}%, ${hsl(color.l)}%, 1)`
 
 const formatNs = (color: ColorObjectType) =>
   `NSColor(red: ${rgbad(color.red())}, green: ${rgbad(color.green())}, blue: ${rgbad(color.blue())}, alpha: 1)`
@@ -68,8 +68,8 @@ const formatColorType = (color: ColorObjectType) => {
   //if (format === 'rgb') return formatRgb(color.rgb())
   if (format === 'rgba') return formatRgba(color.rgb())
   if (format === 'rgbap') return formatRgbap(color.rgb())
-  if (format === 'hsl') return formatHsl(color.hsl().object())
-  if (format === 'hsla') return formatHsla(color.hsl().object())
+  if (format === 'hsl') return formatHsl(color.hsl().object() as HslColor)
+  if (format === 'hsla') return formatHsla(color.hsl().object() as HslColor)
   if (format === 'ns') return formatNs(color.rgb())
   if (format === 'ui') return formatUi(color.rgb())
   return color.hex()
@@ -137,7 +137,7 @@ export const openPicker = (color: RgbColor): Promise<string> =>
 export const copyColor = async () => {
   const clipboard = await readClipboard()
   const color = parseColor(clipboard.toLowerCase().trim()) || defaultColor
-  const value = await openPicker(color.object() as any)
+  const value = await openPicker(color.rgb().object() as RgbColor)
   if (value) {
     const trimmed = value.trim()
     const newColor = parseColor(trimmed)
