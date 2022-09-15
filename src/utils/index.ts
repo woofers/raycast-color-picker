@@ -133,7 +133,6 @@ export const openPicker = (color: RgbColor): Promise<string> =>
     resolve(result)
   })
 
-
 export const copyColor = async () => {
   const clipboard = await readClipboard()
   const color = parseColor(clipboard.toLowerCase().trim()) || defaultColor

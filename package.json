@@ -14,10 +14,18 @@
   "commands": [
     {
       "name": "index",
-      "title": "Open color picker",
+      "title": "Color picker menubar",
       "subtitle": "Opens the native macOS system color picker",
       "description": "Opens the native macOS system color picker",
       "mode": "menu-bar"
+    },
+    {
+      "name": "command",
+      "title": "Open color picker",
+      "subtitle": "Opens the native macOS system color picker",
+      "description": "Opens the native macOS system color picker",
+      "mode": "no-view",
+      "arguments": []
     }
   ],
   "preferences": [
