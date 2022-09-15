@@ -1,6 +1,70 @@
 import { runAppleScriptSync } from 'run-applescript'
-import { Clipboard, showHUD, open } from '@raycast/api'
+import { getPreferenceValues, Clipboard, showHUD, open } from '@raycast/api'
 import Color from 'color'
+import type { Color as ColorObjectType } from 'color'
+
+type BaseColorType = 'hex' | 'rgb' | 'hsl'
+
+type ExtraType = 'hexa' | 'rgba' | 'rgbap' | 'hsla' | 'ns' | 'ui'
+
+type MoreType = 'hsv' | 'hwb' | 'lab' | 'lch'
+
+type ColorType = BaseColorType | ExtraType
+
+type Preferences = {
+  colorFormat: ColorType
+}
+
+type HslColor = {
+  h: number
+  s: number
+  l: number
+}
+
+type RgbColor = {
+  r: number
+  g: number
+  b: number
+}
+
+const getColorFormat = () => {
+  const value = getPreferenceValues<Preferences>()
+  return value?.colorFormat ?? 'hex'
+}
+
+const rgbap = (value: number) => Math.round((value / 255) * 100)
+const rgbad = (value: number) => rgbap(value) / 100
+
+const formatRgb = (color: ColorObjectType) => `rgb(${color.red()}, ${color.green()}, ${color.blue()})`
+
+const formatRgba = (color: ColorObjectType) => `rgba(${color.red()}, ${color.green()}, ${color.blue()}, 1)`
+
+const formatRgbap = (color: ColorObjectType) =>
+  `rgba(${rgbap(color.red())}%, ${rgbap(color.green())}%, ${rgbap(color.blue())}%, 1)`
+
+const formatHsl = (color: HslColor) => `hsl(${color.h}deg, ${color.s}%, ${color.l}%)`
+
+const formatHsla = (color: HslColor) => `hsl(${color.h}deg, ${color.s}%, ${color.l}%, 1)`
+
+const formatNs = (color: ColorObjectType) =>
+  `NSColor(red: ${rgbad(color.red())}, green: ${rgbad(color.green())}, blue: ${rgbad(color.blue())}, alpha: 1)`
+
+const formatUi = (color: ColorObjectType) =>
+  `UIColor(red: ${rgbad(color.red())}, green: ${rgbad(color.green())}, blue: ${rgbad(color.blue())}, alpha: 1)`
+
+const formatColorType = (color: ColorObjectType) => {
+  const format = getColorFormat()
+  if (format === 'hex') return color.hex()
+  if (format === 'hexa') return color.hexa()
+  if (format === 'rgb') return formatRgb(color.rgb())
+  if (format === 'rgba') return formatRgba(color.rgb())
+  if (format === 'rgbap') return formatRgbap(color.rgb())
+  if (format === 'hsl') return formatHsl(color.hsl().object())
+  if (format === 'hsla') return formatHsla(color.hsl().object())
+  if (format === 'ns') return formatNs(color.rgb())
+  if (format === 'ui') return formatUi(color.rgb())
+  return color.hex()
+}
 
 const formatColor = (color: RgbColor) => [color.r, color.g, color.b].map(c => `_8_to_16(${c})`).join(', ')
 
@@ -47,12 +111,6 @@ const readClipboard = () =>
     resolve('')
   })
 
-type RgbColor = {
-  r: number
-  g: number
-  b: number
-}
-
 export const openPicker = (color: RgbColor) =>
   new Promise((resolve, reject) => {
     let result = ''
@@ -84,7 +142,8 @@ export const copyColor = async () => {
   if (value) {
     const trimmed = value.trim()
     const newColor = parseColor(trimmed)
-    const formatted = newColor ? newColor.hex() : trimmed
+    const formatted = newColor ? formatColorType(newColor) : trimmed
+    console.log(formatted)
     copyToClipboard(formatted)
     await showHUD('Color copied to clipboard.')
   }
