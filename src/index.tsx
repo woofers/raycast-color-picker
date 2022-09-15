@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Icon, MenuBarExtra, open } from '@raycast/api'
-import { openPicker } from './utils'
+import { Icon, MenuBarExtra, Clipboard, open } from '@raycast/api'
+import { copyColor } from './utils'
 
 const Command = () => {
   return (
@@ -10,7 +10,7 @@ const Command = () => {
         title={'Open'}
         icon={Icon.Bookmark}
         onAction={() => {
-          openPicker().then(value => console.log(value))
+          copyColor()
         }}
       />
     </MenuBarExtra>

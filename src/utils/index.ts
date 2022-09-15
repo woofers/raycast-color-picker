@@ -1,4 +1,5 @@
-import { runAppleScriptSync } from 'run-applescript'
+import { runAppleScript, runAppleScriptSync } from 'run-applescript'
+import { Clipboard, showHUD, open } from '@raycast/api'
 
 // Adapted from https://apple.stackexchange.com/a/321377
 const SCRIPT = `
@@ -9,19 +10,9 @@ try
   set {r, g, b} to choose color default color {_8_to_16(201), _8_to_16(201), _8_to_16(201)}
   set {r, g, b} to {_16_to_8(r), _16_to_8(g), _16_to_8(b)}
 on error e number n
-  if (n = -128) then --user canceled
-    set clipboard_string to (get the clipboard)
-    if ((clipboard_string count) = 6) then
-      set {r, g, b} to hex_string_to_dec(clipboard_string)
-    else
-      return
-    end if
-  else
-    return
-  end if
+  return
 end try
 
-set the clipboard to ("rgb(" & r & ", " & g & ", " & b & ")")
 return ("rgb(" & r & ", " & g & ", " & b & ")")
 
 on _8_to_16(n)
@@ -59,6 +50,26 @@ on hex_string_to_dec(s)
 end hex_string_to_dec
 `
 
+const copyToClipboard = async (value: string) => {
+  try {
+    await Clipboard.copy(value)
+  } catch (e) {
+    // fall-through
+  }
+}
+
+const readClipboard = () =>
+  new Promise(resolve => {
+    try {
+      const data = runAppleScriptSync(`return (the clipboard as text)`)
+      resolve(data)
+      return
+    } catch (e) {
+      // fall-through
+    }
+    resolve('')
+  })
+
 export const openPicker = () =>
   new Promise((resolve, reject) => {
     let result = ''
@@ -72,3 +83,12 @@ export const openPicker = () =>
     }
     resolve(result)
   })
+
+export const copyColor = async () => {
+  const clipboard = await readClipboard()
+  const value = await openPicker()
+  if (value) {
+    copyToClipboard(value)
+    await showHUD('Color copied to clipboard.')
+  }
+}
