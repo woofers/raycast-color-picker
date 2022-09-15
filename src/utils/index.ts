@@ -1,4 +1,4 @@
-import { runAppleScript, runAppleScriptSync } from 'run-applescript'
+import { runAppleScriptSync } from 'run-applescript'
 import { Clipboard, showHUD, open } from '@raycast/api'
 import Color from 'color'
 
@@ -79,7 +79,7 @@ const parseColor = (value: string) => {
 
 export const copyColor = async () => {
   const clipboard = await readClipboard()
-  const color = parseColor(clipboard.toLowerCase().trim()) ?? Color('#c9c9c9')
+  const color = parseColor(clipboard.toLowerCase().trim()) ?? parseColor('#c9c9c9')
   const value = await openPicker(color.object())
   if (value) {
     const trimmed = value.trim()

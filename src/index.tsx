@@ -8,7 +8,7 @@ const Command = () => {
       <MenuBarExtra.Item title="Color Picker" />
       <MenuBarExtra.Item
         title={'Open'}
-        icon={Icon.Bookmark}
+        icon={Icon.Eye}
         onAction={() => {
           copyColor()
         }}
